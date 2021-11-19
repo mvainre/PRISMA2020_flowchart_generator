@@ -9,7 +9,7 @@ The script is inspired by Peter Higgins's tutorial from 26th January 2019, avail
 Vainre, Maris. (2021).  RMarkdown PRISMA flowchart generator for Word. Version 1. GitHub: doi:
 
 # References
-See also Page MJ, McKenzie JE, Bossuyt PM, Boutron I, Hoffmann TC, Mulrow CD, et al. [The PRISMA 2020 statement: an updated guideline for reporting systematic reviews](http://doi.org/10.1136/bmj.n71). BMJ 2021;372:n71. doi: 10.1136/bmj.n71. 
+Page MJ, McKenzie JE, Bossuyt PM, Boutron I, Hoffmann TC, Mulrow CD, et al. [The PRISMA 2020 statement: an updated guideline for reporting systematic reviews](http://doi.org/10.1136/bmj.n71). BMJ 2021;372:n71. doi: 10.1136/bmj.n71. 
 
 # License
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
