@@ -19,7 +19,7 @@ The script is inspired by Peter Higgins's tutorial from 26th January 2019, avail
 
 ```{r read_data, message=FALSE, warning=FALSE, include=FALSE}
 
-PRISMA_data <- read.csv(here::here("Data/PRISMA.csv"))
+PRISMA_data <- read.csv(here::here("PRISMA.csv"))
 ```
 
 ```{r wrangle_data, message=FALSE, warning=FALSE, include=FALSE}
