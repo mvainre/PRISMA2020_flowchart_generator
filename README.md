@@ -6,7 +6,7 @@ This script[^1] generates a PRISMA 2020 flow diagram[^2] in Word and as a .png f
 [^1]: inspired by Peter Higgins's tutorial from 26th January 2019, available here: https://rpubs.com/phiggins/461686
 [^2]: Read more about PRISMA 2020: Page MJ, McKenzie JE, Bossuyt PM, Boutron I, Hoffmann TC, Mulrow CD, et al. [The PRISMA 2020 statement: an updated guideline for reporting systematic reviews](http://doi.org/10.1136/bmj.n71). BMJ 2021;372:n71. doi: 10.1136/bmj.n71. 
 
-![PRISMA 2020 flowchart](https://github.com/mvainre/PRISMA2020_flowchart_generator/blob/main/PRISMA2020.jpg&s=200)
+![PRISMA 2020 flowchart](https://github.com/mvainre/PRISMA2020_flowchart_generator/blob/main/PRISMA2020.jpg)
 
 # Citation
 Vainre, Maris. (2021).  RMarkdown PRISMA flowchart generator for Word. Version 1. GitHub: doi: ![10.5281/zenodo.5714965](https://doi.org/10.5281/zenodo.5714965)
