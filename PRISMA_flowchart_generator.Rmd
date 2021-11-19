@@ -1,0 +1,360 @@
+---
+title: "Your PRISMA flowchart"
+output: word_document
+geometry: margin = 2mm
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+library("tidyverse", "readxl", "here")
+
+knitr::opts_chunk$set(echo = TRUE)
+version <- 1
+
+```
+
+This script generates a PRISMA 2020 flow Diagram from Page MJ, McKenzie JE, Bossuyt PM, Boutron I, Hoffmann TC, Mulrow CD, et al. [The PRISMA 2020 statement: an updated guideline for reporting systematic reviews](http://doi.org/10.1136/bmj.n71). BMJ 2021;372:n71. doi: 10.1136/bmj.n71
+
+The script is inspired by Peter Higgins's tutorial from 26th January 2019, available here: https://rpubs.com/phiggins/461686
+
+```{r read_data, message=FALSE, warning=FALSE, include=FALSE}
+
+PRISMA_data <- read.csv(here::here("Data/PRISMA.csv"))
+```
+
+```{r wrangle_data, message=FALSE, warning=FALSE, include=FALSE}
+
+PRISMA_data$recScreened <- PRISMA_data$records_db + PRISMA_data$handSearch - PRISMA_data$duplRec - PRISMA_data$autoIneligble - PRISMA_data$remOther
+PRISMA_data$recRetr <- PRISMA_data$recScreened - PRISMA_data$screenRecExcl
+PRISMA_data$repAssessed <- PRISMA_data$recRetr - PRISMA_data$recNotRetr
+PRISMA_data$reportIncl <- PRISMA_data$repAssessed - PRISMA_data$exclReason1 - PRISMA_data$exclReason2 - PRISMA_data$exclReason3 - PRISMA_data$exclReason4 - PRISMA_data$exclReason6 - PRISMA_data$exclReason6 - PRISMA_data$exclReason7 
+
+```
+
+```{r flowchart_canvas, message=FALSE, warning=FALSE, include=FALSE}
+#Creating a working space. Grid lines are to help to align and place boxes.
+
+#Define the size of canvas
+tibble_min = 1
+tibble_max = 150 #increase this if the lower part of the chart gets cut-off
+
+#CONSORT
+data <- tibble(x= tibble_min:tibble_max, y= tibble_min:tibble_max)
+
+data %>% 
+  ggplot(aes(x, y)) +
+  scale_x_continuous(minor_breaks = seq(10, tibble_max, 10)) +
+  scale_y_continuous(minor_breaks = seq(10, tibble_max, 10)) +
+  labs(caption = "Created using RMarkdown script by Vainre (2021)") +
+  theme_void() -> #for easier editing, replace this with theme_linedraw()
+  p
+
+
+```
+
+```{r flowchart_parameters, message=FALSE, warning=FALSE, include=FALSE}
+#setting quality and dimensions for the image. Reduce width and height if you need more space or need to be more conservative with space
+knitr::opts_chunk$set(dpi=800, fig.width = 11, fig.height = 9)
+
+#the parameters for the flowchart
+gap_bw_columns <- 10
+
+x_col1_start <- tibble_min
+x_col1_end <- tibble_max/2-gap_bw_columns
+x_col1_mid <- (x_col1_end-x_col1_start)/2
+
+x_col2_start <- x_col1_end+2*gap_bw_columns
+x_col2_end <- tibble_max
+x_col2_mid <- (x_col2_end-x_col2_start)/2+x_col2_start
+
+#what's the height of a box that contains just 1 line of text?
+height_y_1line <- 6 
+
+# specify where rows start
+row1 <- tibble_max                #records identified
+row2 <- row1 - 8*height_y_1line   #records screened
+row3 <- row2 - 4*height_y_1line   #records sought for retrieval
+row4 <- row3 - 4*height_y_1line   #reports assessed for eligibility
+row5 <- row4 - 4*height_y_1line   #records included in review
+
+#Aesthetics
+bordercolour <- "grey" #the colour of the borders
+arrowcolour <- bordercolour #colour of the arrows (line + end)
+fillcolour <- "white" #the colour of boxes
+textsize <- 5.5
+border_width <- 0.75
+arrow_width <- border_width
+arrow_size <- 3
+line_spacing <- 1 
+
+#rm(gap_bw_columns, tibble_min, tibble_max)
+```
+
+```{r generate_flowchart, echo=FALSE, message=FALSE, warning=FALSE}
+########################  IDENTIFICATION ######################## 
+
+# Texts searched through databases
+p +
+  geom_rect(xmin = x_col1_start, 
+            xmax = x_col1_end, 
+            ymin = row1-3*height_y_1line, 
+            ymax = row1, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col1_mid, 
+           y = row1-3*height_y_1line/2,
+           label = paste("Records identified from\n Databases: k =", PRISMA_data$records_db,"\n Hand searches: k =", PRISMA_data$handSearch),            
+           size = textsize) ->
+  p
+
+#Records removed before screening
+
+p +
+  geom_rect(xmin = x_col2_start, 
+            xmax = x_col2_end, 
+            ymin = row1-6*height_y_1line, 
+            ymax = row1, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col2_mid, 
+           y = row1-3*height_y_1line,
+           label = paste("Records removed before screening\n Duplicate records: k =", PRISMA_data$duplRec,"\n Records marked as ineligible\n by automation tools: k =", PRISMA_data$autoIneligble, "\n Records removed for other reasons:\n k =", PRISMA_data$remOther),            
+           size = textsize) ->
+  p
+
+#Row1 -> row 2 arrows
+#horisontal
+p +
+  geom_segment(x = x_col1_end, 
+               xend = x_col2_start, 
+               y = row1-1.5*height_y_1line,
+               yend = row1-1.5*height_y_1line, 
+               size = arrow_width,
+               colour = arrowcolour,
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) +
+  #down
+  geom_segment(x = x_col1_mid, 
+               xend = x_col1_mid,
+               y = row1-3*height_y_1line,
+               yend = row2,
+               size = arrow_width, 
+               colour = arrowcolour, 
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) ->
+  p
+
+
+######################## SCREENING ######################## 
+
+#Records screened
+p +
+  geom_rect(xmin = x_col1_start, 
+            xmax = x_col1_end, 
+            ymin = row2-2*height_y_1line, 
+            ymax = row2, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col1_mid, 
+           y = row2-height_y_1line,
+           label = paste("Records screened:\n k =", PRISMA_data$recScreened), 
+           size = textsize) ->
+  p
+
+
+#Records excluded
+p +
+  geom_rect(xmin = x_col2_start, 
+            xmax = x_col2_end, 
+            ymin = row2-2*height_y_1line, 
+            ymax = row2, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col2_mid, 
+           y = row2-2*height_y_1line/2,
+           label = paste("Records excluded:\n k =", PRISMA_data$screenRecExcl), 
+           size = textsize) ->
+  p
+
+
+#Row2 -> row 3 arrows
+#horisontal
+p +
+  geom_segment(x = x_col1_end, 
+               xend = x_col2_start, 
+               y = row2-height_y_1line,
+               yend = row2-height_y_1line, 
+               size = arrow_width, 
+               colour = arrowcolour, 
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) +
+  #down
+  geom_segment(x = x_col1_mid, 
+               xend = x_col1_mid,
+               y = row2 - 2*height_y_1line, #make sure your height_y is correct
+               yend = row3,
+               size = arrow_width, 
+               colour = arrowcolour, 
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) ->
+  p
+
+#Reports sought for retrieval
+p +
+  geom_rect(xmin = x_col1_start, 
+            xmax = x_col1_end, 
+            ymin = row3-2*height_y_1line, 
+            ymax = row3, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col1_mid, 
+           y = row3-height_y_1line,
+           label = paste("Reports sought for retrieval:\n k =", PRISMA_data$recRetr), 
+           size = textsize) ->
+  p
+
+#Records not retreived
+p +
+  geom_rect(xmin = x_col2_start, 
+            xmax = x_col2_end, 
+            ymin = row3-2*height_y_1line, 
+            ymax = row3, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col2_mid, 
+           y = row3-height_y_1line,
+           label = paste("Reports not retreived:\n k =", PRISMA_data$recNotRetr), 
+           size = textsize) ->
+  p
+
+#Row3 -> row 4 arrows
+#horisontal
+p +
+  geom_segment(x = x_col1_end, 
+               xend = x_col2_start, 
+               y = row3-height_y_1line,
+               yend = row3-height_y_1line, 
+               size = arrow_width, 
+               colour = arrowcolour, 
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) +
+  #down
+  geom_segment(x = x_col1_mid, 
+               xend = x_col1_mid,
+               y = row3-2*height_y_1line, #make sure your height_y is correct, should match the height of the box
+               yend = row4,
+               size = arrow_width, 
+               colour = arrowcolour, 
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) ->
+  p
+
+
+#Reports assessed for eligibility
+p +
+  geom_rect(xmin = x_col1_start, 
+            xmax = x_col1_end, 
+            ymin = row4-2*height_y_1line, 
+            ymax = row4, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col1_mid, 
+           y = row4-height_y_1line,
+           label = paste("Reports assessed for eligibility:\n k =", PRISMA_data$repAssessed), 
+           size = textsize) ->
+  p
+
+#Reports excluded
+p +
+  geom_rect(xmin = x_col2_start, 
+            xmax = x_col2_end, 
+            ymin = row4-6*height_y_1line, 
+            ymax = row4, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col2_mid, 
+           y = row4-3*height_y_1line,
+           label = paste("Reports excluded:\n Reason 1 =", PRISMA_data$exclReason1,"\n Reason 2 =", PRISMA_data$exclReason2,"\n Reason 3 =", PRISMA_data$exclReason3,"\n Reason 4 =", PRISMA_data$exclReason4,"\n Reason 5 =", PRISMA_data$exclReason5), 
+           size = textsize) ->
+  p
+
+
+#Row4 -> row 5 arrows
+#horisontal
+p +
+  geom_segment(x = x_col1_end, 
+               xend = x_col2_start, 
+               y = row4-height_y_1line,
+               yend = row4-height_y_1line, 
+               size = arrow_width, 
+               colour = arrowcolour, 
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) +
+  #down
+  geom_segment(x = x_col1_mid, 
+               xend = x_col1_mid,
+               y = row4 - 2*height_y_1line, #make sure your height_y is correct, should match the height of the box
+               yend = row5,
+               size = arrow_width, 
+               colour = arrowcolour, 
+               linejoin = "mitre", 
+               lineend = "butt",
+               arrow = arrow(length = unit(arrow_size, "mm"),
+                             type= "closed")) ->
+  p
+
+########################  INCLUDED  ######################## 
+
+#Reports included in review
+p +
+  geom_rect(xmin = x_col1_start, 
+            xmax = x_col1_end, 
+            ymin = row5-4*height_y_1line, 
+            ymax = row5, 
+            colour = bordercolour,
+            fill = fillcolour, 
+            size = border_width ) +
+  annotate('text', 
+           x = x_col1_mid, 
+           y = row5-2*height_y_1line,
+           label = paste("Studies included in review:\n k =", PRISMA_data$studyIncl,"\n Reports included in review:\n k =", PRISMA_data$reportIncl), 
+           size = textsize) ->
+  p
+
+ggsave(plot = p, "PRISMA2020.png")
+
+p
+```
+
+Please cite as: 
+Vainre, Maris. (2021).  RMarkdown PRISMA flowchart generator for Word. Version `r version`. GitHub: doi
