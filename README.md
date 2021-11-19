@@ -1,10 +1,12 @@
 # PRISMA 2020 Flowchart Generator
 
-This script generates a PRISMA 2020 flow Diagram from Page MJ, McKenzie JE, Bossuyt PM, Boutron I, Hoffmann TC, Mulrow CD, et al. [The PRISMA 2020 statement: an updated guideline for reporting systematic reviews](http://doi.org/10.1136/bmj.n71). BMJ 2021;372:n71. doi: 10.1136/bmj.n71
+This script generates a PRISMA 2020 flow Diagram from Page MJ, McKenzie JE, Bossuyt PM, Boutron I, Hoffmann TC, Mulrow CD, et al. [The PRISMA 2020 statement: an updated guideline for reporting systematic reviews](http://doi.org/10.1136/bmj.n71). BMJ 2021;372:n71. doi: 10.1136/bmj.n71. The script is inspired by Peter Higgins's tutorial from 26th January 2019, available here: https://rpubs.com/phiggins/461686
 
-The script is inspired by Peter Higgins's tutorial from 26th January 2019, available here: https://rpubs.com/phiggins/461686
+Vainre, Maris. (2021).  RMarkdown PRISMA flowchart generator for Word. Version 1. GitHub: doi:
 
-Vainre, Maris. (2021).  RMarkdown PRISMA flowchart generator for Word. Version `r version`. GitHub: doi
+
+
+
 
 Shield: [![CC BY 4.0][cc-by-shield]][cc-by]
 
